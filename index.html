@@ -1,246 +1,219 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="theme-color" content="#f5f6f2">
-	<title>Daymark | Student Task Manager</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-	<style>
-		:root {
-			color-scheme: light;
-			--ink: #202820;
-			--muted: #788078;
-			--line: #e5e8e1;
-			--paper: #fbfcf9;
-			--canvas: #f3f5f0;
-			--green: #315b42;
-			--green-dark: #244631;
-			--green-soft: #e8f0e7;
-			--lime: #d9ed8a;
-			--coral: #bf614b;
-			--coral-soft: #faece7;
-			--amber: #b77a28;
-			--amber-soft: #f8f0df;
-			--shadow: 0 18px 48px rgba(35, 49, 38, .09);
-		}
-
-		* { box-sizing: border-box; }
-		body { margin: 0; background: var(--canvas); color: var(--ink); font-family: "DM Sans", sans-serif; font-size: 14px; }
-		button, input, textarea, select { font: inherit; }
-		button { cursor: pointer; }
-		.app-shell { min-height: 100vh; display: grid; grid-template-columns: 246px minmax(0, 1fr); max-width: 1600px; margin: 0 auto; background: var(--paper); }
-		.sidebar { display: flex; flex-direction: column; padding: 28px 18px 20px; border-right: 1px solid var(--line); background: #f8faf6; }
-		.brand { display: flex; align-items: center; gap: 11px; margin: 0 10px 39px; color: var(--ink); text-decoration: none; }
-		.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: var(--green); color: white; font: 800 17px Manrope, sans-serif; }
-		.brand-name { font: 800 18px Manrope, sans-serif; letter-spacing: 0; }
-		.nav-label { margin: 0 10px 10px; color: #929991; font-size: 10px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; }
-		.nav-list { display: grid; gap: 4px; }
-		.nav-item { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 42px; padding: 0 11px; border: 0; border-radius: 7px; background: transparent; color: #626c63; text-align: left; transition: background .18s, color .18s; }
-		.nav-item:hover { background: #edf1e9; color: var(--ink); }
-		.nav-item.active { background: var(--green-soft); color: var(--green-dark); font-weight: 700; }
-		.nav-symbol { width: 18px; color: #758077; font-size: 16px; text-align: center; }
-		.nav-item.active .nav-symbol { color: var(--green); }
-		.nav-count { margin-left: auto; color: #899188; font-size: 12px; }
-		.sidebar-bottom { margin-top: auto; padding: 18px 12px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.6; }
-		.sidebar-bottom strong { display: block; margin-bottom: 4px; color: var(--ink); font: 700 13px Manrope, sans-serif; }
-		main { min-width: 0; padding: 32px clamp(22px, 5vw, 68px) 60px; }
-		.topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; max-width: 1040px; margin: 0 auto 37px; }
-		.date-line { color: var(--muted); font-size: 13px; }
-		.top-actions { display: flex; align-items: center; gap: 12px; }
-		.avatar { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid #dce4d9; border-radius: 50%; background: #edf3e8; color: var(--green); font-weight: 700; }
-		.primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 42px; padding: 0 16px; border: 0; border-radius: 7px; background: var(--green); color: white; font-weight: 700; transition: background .18s, transform .18s; }
-		.primary-button:hover { transform: translateY(-1px); background: var(--green-dark); }
-		.primary-button .plus { font-size: 20px; font-weight: 400; line-height: 1; }
-		.content { max-width: 1040px; margin: 0 auto; animation: appear .35s ease both; }
-		@keyframes appear { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
-		.eyebrow { margin: 0 0 7px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-		h1, h2, p { margin-top: 0; }
-		h1 { margin-bottom: 8px; font: 800 clamp(28px, 3vw, 36px)/1.18 Manrope, sans-serif; letter-spacing: 0; }
-		.intro { margin-bottom: 25px; color: var(--muted); font-size: 14px; }
-		.overview { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 12px; margin-bottom: 30px; }
-		.overview-card { display: flex; align-items: center; min-height: 91px; gap: 15px; padding: 17px 19px; border: 1px solid var(--line); border-radius: 8px; background: white; }
-		.overview-card.featured { justify-content: space-between; border-color: var(--green); background: var(--green); color: white; }
-		.overview-copy { display: grid; gap: 4px; }
-		.overview-copy span { color: var(--muted); font-size: 12px; }
-		.featured .overview-copy span { color: #d1e0d2; }
-		.overview-copy strong { font: 800 25px Manrope, sans-serif; }
-		.overview-icon { display: grid; place-items: center; flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 17px; }
-		.featured .overview-icon { background: rgba(255,255,255,.13); color: var(--lime); }
-		.progress-track { width: 76px; height: 76px; padding: 7px; border-radius: 50%; background: conic-gradient(var(--lime) var(--progress, 0%), rgba(255,255,255,.17) 0); }
-		.progress-center { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--green); color: white; font-size: 12px; font-weight: 700; }
-		.section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-		.section-head h2 { margin: 0; font: 800 18px Manrope, sans-serif; }
-		.section-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
-		.task-count { color: var(--muted); font-size: 12px; }
-		.toolbar { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
-		.search-wrap { position: relative; flex: 1 1 210px; max-width: 320px; }
-		.search-symbol { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); color: #899188; font-size: 16px; pointer-events: none; }
-		.search-input, .filter-select { width: 100%; height: 39px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; outline: 0; background: white; color: var(--ink); }
-		.search-input { padding-left: 35px; }
-		.search-input:focus, .filter-select:focus { border-color: #819c7d; box-shadow: 0 0 0 3px rgba(49,91,66,.09); }
-		.filter-select { width: auto; min-width: 140px; color: #59635a; }
-		.task-list { display: grid; gap: 9px; }
-		.task-card { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: start; gap: 13px; padding: 17px 17px 15px; border: 1px solid var(--line); border-radius: 7px; background: white; transition: border-color .18s, box-shadow .18s, opacity .18s; }
-		.task-card:hover { border-color: #cbd5c8; box-shadow: 0 5px 17px rgba(35,49,38,.045); }
-		.task-card.done { background: #fcfdfa; }
-		.check-button { display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; padding: 0; border: 1.5px solid #c6cec5; border-radius: 50%; background: white; color: transparent; font-size: 13px; transition: all .18s; }
-		.check-button:hover { border-color: var(--green); }
-		.done .check-button { border-color: var(--green); background: var(--green); color: white; }
-		.task-main { min-width: 0; }
-		.task-title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-		.task-title { margin: 0; overflow-wrap: anywhere; font-size: 14px; font-weight: 700; }
-		.done .task-title { color: #929991; text-decoration: line-through; }
-		.priority { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: capitalize; }
-		.priority::before { width: 6px; height: 6px; border-radius: 50%; background: currentColor; content: ""; }
-		.priority.high { background: var(--coral-soft); color: var(--coral); }
-		.priority.medium { background: var(--amber-soft); color: var(--amber); }
-		.priority.low { background: #eef0ed; color: #68736a; }
-		.task-description { margin: 6px 0 8px; color: #747e75; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
-		.task-description:empty { display: none; }
-		.task-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; color: #818980; font-size: 11px; }
-		.task-meta .due-today { color: var(--coral); font-weight: 700; }
-		.task-meta .due-soon { color: var(--amber); font-weight: 700; }
-		.task-actions { display: flex; align-items: center; gap: 3px; }
-		.icon-button { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 5px; background: transparent; color: #7c867d; font-size: 13px; }
-		.icon-button:hover { background: #f0f3ed; color: var(--ink); }
-		.icon-button.delete:hover { background: var(--coral-soft); color: var(--coral); }
-		.empty-state { display: grid; justify-items: center; padding: 55px 20px; border: 1px dashed #d8ded5; border-radius: 7px; background: #fdfefc; text-align: center; }
-		.empty-mark { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 14px; border-radius: 14px; background: var(--green-soft); color: var(--green); font-size: 21px; }
-		.empty-state h3 { margin: 0 0 6px; font: 700 15px Manrope, sans-serif; }
-		.empty-state p { max-width: 260px; margin: 0 0 17px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-		dialog { width: min(480px, calc(100% - 28px)); max-height: min(90vh, 720px); padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); box-shadow: var(--shadow); }
-		dialog::backdrop { background: rgba(24, 34, 26, .38); backdrop-filter: blur(2px); }
-		.dialog-head { display: flex; align-items: start; justify-content: space-between; padding: 23px 24px 17px; border-bottom: 1px solid var(--line); }
-		.dialog-head h2 { margin: 0 0 5px; font: 800 19px Manrope, sans-serif; }
-		.dialog-head p { margin: 0; color: var(--muted); font-size: 12px; }
-		.close-button { width: 30px; height: 30px; border: 0; border-radius: 5px; background: transparent; color: #69736a; font-size: 19px; }
-		.close-button:hover { background: #edf1e9; }
-		.task-form { display: grid; gap: 15px; padding: 20px 24px 24px; }
-		.field { display: grid; gap: 6px; }
-		.field label { color: #515b52; font-size: 12px; font-weight: 700; }
-		.field input, .field textarea, .field select { width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid #dfe4dc; border-radius: 6px; outline: 0; background: white; color: var(--ink); }
-		.field textarea { min-height: 82px; resize: vertical; }
-		.field input:focus, .field textarea:focus, .field select:focus { border-color: #819c7d; box-shadow: 0 0 0 3px rgba(49,91,66,.09); }
-		.field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-		.form-actions { display: flex; justify-content: end; gap: 9px; margin-top: 3px; }
-		.secondary-button { min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 6px; background: white; color: #5d675e; font-weight: 600; }
-		.secondary-button:hover { background: #f2f4f0; }
-		.toast { position: fixed; right: 24px; bottom: 24px; z-index: 5; padding: 12px 16px; border: 1px solid #d3e1d0; border-radius: 7px; background: white; color: var(--green-dark); box-shadow: var(--shadow); font-size: 13px; font-weight: 600; animation: toast-in .2s ease both; }
-		@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-		@media (max-width: 780px) {
-			.app-shell { grid-template-columns: 1fr; }
-			.sidebar { display: block; padding: 14px 18px 10px; border-right: 0; border-bottom: 1px solid var(--line); }
-			.brand { margin: 0 0 12px; }
-			.sidebar .nav-label, .sidebar-bottom { display: none; }
-			.nav-list { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 1px; }
-			.nav-item { justify-content: center; flex: 0 0 auto; min-height: 37px; padding: 0 11px; font-size: 12px; }
-			.nav-symbol { display: none; }
-			.nav-count { margin-left: 3px; font-size: 11px; }
-			main { padding: 20px 22px 44px; }
-			.topbar { margin-bottom: 27px; }
-		}
-		@media (max-width: 540px) {
-			.sidebar { padding-right: 14px; padding-left: 14px; }
-			main { padding: 18px 15px 36px; }
-			.topbar { margin-bottom: 24px; }
-			.date-line { max-width: 150px; font-size: 11px; }
-			.top-actions { gap: 8px; }
-			.avatar { width: 32px; height: 32px; }
-			.top-actions .primary-button { min-height: 38px; padding: 0 11px; font-size: 12px; }
-			.overview { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 26px; }
-			.overview-card { min-height: 77px; padding: 12px; gap: 9px; }
-			.overview-card.featured { grid-column: 1 / -1; min-height: 86px; }
-			.overview-copy strong { font-size: 22px; }
-			.overview-icon { flex-basis: 32px; width: 32px; height: 32px; }
-			.progress-track { width: 65px; height: 65px; }
-			.section-head { align-items: start; }
-			.toolbar { display: grid; grid-template-columns: 1fr 1fr; }
-			.search-wrap { grid-column: 1 / -1; max-width: none; }
-			.filter-select { min-width: 0; width: 100%; font-size: 12px; }
-			.task-card { grid-template-columns: 22px minmax(0, 1fr); gap: 10px; padding: 14px 12px; }
-			.task-actions { grid-column: 2; justify-content: end; margin-top: -3px; }
-			.field-pair { grid-template-columns: 1fr; }
-			.dialog-head, .task-form { padding-right: 18px; padding-left: 18px; }
-		}
-		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
-	</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f6f2">
+    <title>Daymark | Student Task Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-	<div class="app-shell">
-		<aside class="sidebar" aria-label="Task navigation">
-			<a class="brand" href="#" aria-label="Daymark home">
-				<span class="brand-mark" aria-hidden="true">D</span>
-				<span class="brand-name">daymark</span>
-			</a>
-			<p class="nav-label">Workspace</p>
-			<nav class="nav-list" aria-label="Task views">
-				<button class="nav-item active" type="button" data-view="all"><span class="nav-symbol" aria-hidden="true">▤</span><span>All tasks</span><span class="nav-count" data-nav-count="all">0</span></button>
-				<button class="nav-item" type="button" data-view="today"><span class="nav-symbol" aria-hidden="true">◷</span><span>Due today</span><span class="nav-count" data-nav-count="today">0</span></button>
-				<button class="nav-item" type="button" data-view="upcoming"><span class="nav-symbol" aria-hidden="true">▦</span><span>Upcoming</span><span class="nav-count" data-nav-count="upcoming">0</span></button>
-				<button class="nav-item" type="button" data-view="completed"><span class="nav-symbol" aria-hidden="true">✓</span><span>Completed</span><span class="nav-count" data-nav-count="completed">0</span></button>
-			</nav>
-			<div class="sidebar-bottom"><strong>A little progress adds up.</strong>Your study plan, all in one place.</div>
-		</aside>
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Task navigation">
+            <a class="brand" href="#" aria-label="Daymark home">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span class="brand-name">daymark</span>
+            </a>
+            <p class="nav-label">Workspace</p>
+            <nav class="nav-list" aria-label="Task views">
+                <button class="nav-item active" type="button" data-view="all"><span class="nav-symbol"
+                        aria-hidden="true">▤</span><span>All tasks</span><span class="nav-count"
+                        data-nav-count="all">0</span></button>
+                <button class="nav-item" type="button" data-view="today"><span class="nav-symbol"
+                        aria-hidden="true">◷</span><span>Due today</span><span class="nav-count"
+                        data-nav-count="today">0</span></button>
+                <button class="nav-item" type="button" data-view="upcoming"><span class="nav-symbol"
+                        aria-hidden="true">▦</span><span>Upcoming</span><span class="nav-count"
+                        data-nav-count="upcoming">0</span></button>
+                <button class="nav-item" type="button" data-view="completed"><span class="nav-symbol"
+                        aria-hidden="true">✓</span><span>Completed</span><span class="nav-count"
+                        data-nav-count="completed">0</span></button>
+                <button class="nav-item" type="button" data-view="subjects"><span class="nav-symbol"
+                        aria-hidden="true">▣</span><span>Subjects &amp; labs</span><span class="nav-count"
+                        data-nav-count="subjects">0</span></button>
+            </nav>
+            <div class="sidebar-bottom"><strong>A little progress adds up.</strong>Your study plan, all in one place.
+            </div>
+        </aside>
 
-		<main>
-			<header class="topbar">
-				<div class="date-line" id="today-label"></div>
-				<div class="top-actions">
-					<div class="avatar" aria-label="Student profile">S</div>
-					<button class="primary-button" type="button" data-add-task><span class="plus" aria-hidden="true">+</span><span>New task</span></button>
-				</div>
-			</header>
+        <main>
+            <header class="topbar">
+                <div class="date-line" id="today-label"></div>
+                <div class="top-actions">
+                    <div class="avatar" aria-label="Student profile">S</div>
+                    <button class="primary-button" type="button" data-add-task><span class="plus"
+                            aria-hidden="true">+</span><span>New task</span></button>
+                    <button class="primary-button" type="button" data-add-subject hidden><span class="plus"
+                            aria-hidden="true">+</span><span>Add subject</span></button>
+                </div>
+            </header>
 
-			<section class="content" aria-labelledby="page-title">
-				<p class="eyebrow">Your study space</p>
-				<h1 id="page-title">Make today count.</h1>
-				<p class="intro">A clear plan makes room for your best work.</p>
+            <section class="content" aria-labelledby="page-title">
+                <p class="eyebrow">Your study space</p>
+                <h1 id="page-title">Make today count.</h1>
+                <p class="intro">A clear plan makes room for your best work.</p>
 
-				<section class="overview" aria-label="Task overview">
-					<div class="overview-card featured">
-						<div class="overview-copy"><span>Today's progress</span><strong id="progress-copy">0 of 0 done</strong></div>
-						<div class="progress-track" id="progress-ring" role="img" aria-label="0 percent complete"><div class="progress-center" id="progress-percent">0%</div></div>
-					</div>
-					<div class="overview-card"><div class="overview-icon" aria-hidden="true">◷</div><div class="overview-copy"><span>Due today</span><strong id="due-today-count">0</strong></div></div>
-					<div class="overview-card"><div class="overview-icon" aria-hidden="true">↗</div><div class="overview-copy"><span>Open tasks</span><strong id="open-count">0</strong></div></div>
-				</section>
+                <section class="overview" id="task-overview" aria-label="Task overview">
+                    <div class="overview-card featured">
+                        <div class="overview-copy"><span>Today's progress</span><strong id="progress-copy">0 of 0
+                                done</strong></div>
+                        <div class="progress-track" id="progress-ring" role="img" aria-label="0 percent complete">
+                            <div class="progress-center" id="progress-percent">0%</div>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon" aria-hidden="true">◷</div>
+                        <div class="overview-copy"><span>Due today</span><strong id="due-today-count">0</strong></div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon" aria-hidden="true">↗</div>
+                        <div class="overview-copy"><span>Open tasks</span><strong id="open-count">0</strong></div>
+                    </div>
+                </section>
+                <section class="overview" id="subject-overview" aria-label="Preparation overview" hidden>
+                    <div class="overview-card featured">
+                        <div class="overview-copy"><span class="subject-overview-label">Overall
+                                preparation</span><strong id="subject-completion">0%</strong></div>
+                        <div class="progress-track" id="subject-progress-ring" role="img"
+                            aria-label="0 percent prepared">
+                            <div class="progress-center" id="subject-progress-percent">0%</div>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon" aria-hidden="true">◉</div>
+                        <div class="overview-copy"><span>Preparation score</span><strong
+                                id="subject-score-average">—</strong></div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon" aria-hidden="true">▣</div>
+                        <div class="overview-copy"><span>Subjects &amp; labs</span><strong id="subject-total">0</strong>
+                        </div>
+                    </div>
+                </section>
 
-				<section aria-labelledby="tasks-heading">
-					<div class="section-head">
-						<div><h2 id="tasks-heading">All tasks</h2><p id="view-subtitle">Everything on your study list</p></div>
-						<span class="task-count" id="visible-count"></span>
-					</div>
-					<div class="toolbar" role="search">
-						<label class="search-wrap"><span class="search-symbol" aria-hidden="true">⌕</span><input class="search-input" id="search-input" type="search" placeholder="Search tasks..." aria-label="Search tasks"></label>
-						<label><span class="sr-only" hidden>Filter by status</span><select class="filter-select" id="status-filter" aria-label="Filter by status"><option value="all">Any status</option><option value="active">To do</option><option value="completed">Completed</option></select></label>
-						<label><span class="sr-only" hidden>Filter by priority</span><select class="filter-select" id="priority-filter" aria-label="Filter by priority"><option value="all">Any priority</option><option value="high">High priority</option><option value="medium">Medium priority</option><option value="low">Low priority</option></select></label>
-					</div>
-					<div class="task-list" id="task-list" aria-live="polite"></div>
-				</section>
-			</section>
-		</main>
-	</div>
+                <section id="task-panel" aria-labelledby="tasks-heading">
+                    <div class="section-head">
+                        <div>
+                            <h2 id="tasks-heading">All tasks</h2>
+                            <p id="view-subtitle">Everything on your study list</p>
+                        </div>
+                        <span class="task-count" id="visible-count"></span>
+                    </div>
+                    <div class="toolbar" role="search">
+                        <label class="search-wrap"><span class="search-symbol" aria-hidden="true">⌕</span><input
+                                class="search-input" id="search-input" type="search" placeholder="Search tasks..."
+                                aria-label="Search tasks"></label>
+                        <label><span class="sr-only" hidden>Filter by status</span><select class="filter-select"
+                                id="status-filter" aria-label="Filter by status">
+                                <option value="all">Any status</option>
+                                <option value="active">To do</option>
+                                <option value="completed">Completed</option>
+                            </select></label>
+                        <label><span class="sr-only" hidden>Filter by priority</span><select class="filter-select"
+                                id="priority-filter" aria-label="Filter by priority">
+                                <option value="all">Any priority</option>
+                                <option value="high">High priority</option>
+                                <option value="medium">Medium priority</option>
+                                <option value="low">Low priority</option>
+                            </select></label>
+                    </div>
+                    <div class="task-list" id="task-list" aria-live="polite"></div>
+                </section>
+                <section id="subject-panel" aria-labelledby="subjects-heading" hidden>
+                    <div class="section-head">
+                        <div>
+                            <h2 id="subjects-heading">Subjects &amp; labs</h2>
+                            <p>Track how ready you feel for each class and practical.</p>
+                        </div>
+                        <span class="task-count" id="subject-visible-count"></span>
+                    </div>
+                    <div class="toolbar">
+                        <label class="search-wrap"><span class="search-symbol" aria-hidden="true">⌕</span><input
+                                class="search-input" id="subject-search" type="search"
+                                placeholder="Search subjects and labs..." aria-label="Search subjects and labs"></label>
+                        <select class="filter-select" id="subject-type-filter" aria-label="Filter by type">
+                            <option value="all">All types</option>
+                            <option value="subject">Subjects</option>
+                            <option value="lab">Labs</option>
+                        </select>
+                    </div>
+                    <div class="subject-list" id="subject-list" aria-live="polite"></div>
+                </section>
+            </section>
+        </main>
+    </div>
 
-	<dialog id="task-dialog" aria-labelledby="dialog-title">
-		<div class="dialog-head">
-			<div><h2 id="dialog-title">Add a task</h2><p>Give your next step a place on the list.</p></div>
-			<button class="close-button" type="button" data-close-dialog aria-label="Close dialog">×</button>
-		</div>
-		<form class="task-form" id="task-form">
-			<input type="hidden" id="task-id">
-			<div class="field"><label for="task-title-input">Task title</label><input id="task-title-input" name="title" type="text" maxlength="100" placeholder="e.g. Review lecture notes" required></div>
-			<div class="field"><label for="task-description-input">Description <span style="font-weight:400;color:#899188">(optional)</span></label><textarea id="task-description-input" name="description" maxlength="500" placeholder="Add a few details..."></textarea></div>
-			<div class="field-pair">
-				<div class="field"><label for="task-due-input">Due date</label><input id="task-due-input" name="dueDate" type="date" required></div>
-				<div class="field"><label for="task-priority-input">Priority</label><select id="task-priority-input" name="priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></div>
-			</div>
-			<div class="form-actions"><button class="secondary-button" type="button" data-close-dialog>Cancel</button><button class="primary-button" id="save-task-button" type="submit">Add task</button></div>
-		</form>
-	</dialog>
-	<div id="toast-region" aria-live="polite" aria-atomic="true"></div>
-	<script src="index.js" defer></script>
+    <dialog id="task-dialog" aria-labelledby="dialog-title">
+        <div class="dialog-head">
+            <div>
+                <h2 id="dialog-title">Add a task</h2>
+                <p>Give your next step a place on the list.</p>
+            </div>
+            <button class="close-button" type="button" data-close-dialog aria-label="Close dialog">×</button>
+        </div>
+        <form class="task-form" id="task-form">
+            <input type="hidden" id="task-id">
+            <div class="field"><label for="task-title-input">Task title</label><input id="task-title-input" name="title"
+                    type="text" maxlength="100" placeholder="e.g. Review lecture notes" required></div>
+            <div class="field"><label for="task-description-input">Description <span
+                        style="font-weight:400;color:#899188">(optional)</span></label><textarea
+                    id="task-description-input" name="description" maxlength="500"
+                    placeholder="Add a few details..."></textarea></div>
+            <div class="field-pair">
+                <div class="field"><label for="task-due-input">Due date</label><input id="task-due-input" name="dueDate"
+                        type="date" required></div>
+                <div class="field"><label for="task-priority-input">Priority</label><select id="task-priority-input"
+                        name="priority">
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="low">Low</option>
+                    </select></div>
+            </div>
+            <div class="form-actions"><button class="secondary-button" type="button"
+                    data-close-dialog>Cancel</button><button class="primary-button" id="save-task-button"
+                    type="submit">Add task</button></div>
+        </form>
+    </dialog>
+    <dialog id="subject-dialog" aria-labelledby="subject-dialog-title">
+        <div class="dialog-head">
+            <div>
+                <h2 id="subject-dialog-title">Add a subject or lab</h2>
+                <p>Keep your preparation progress in view.</p>
+            </div>
+            <button class="close-button" type="button" data-close-subject-dialog aria-label="Close dialog">×</button>
+        </div>
+        <form class="task-form" id="subject-form">
+            <input type="hidden" id="subject-id">
+            <div class="field"><label for="subject-name-input">Name</label><input id="subject-name-input" type="text"
+                    maxlength="100" placeholder="e.g. Chemistry" required></div>
+            <div class="field"><label for="subject-kind-input">Type</label><select id="subject-kind-input">
+                    <option value="subject">Subject</option>
+                    <option value="lab">Lab</option>
+                </select></div>
+            <div class="field"><label for="subject-description-input">Notes <span
+                        style="font-weight:400;color:#899188">(optional)</span></label><textarea
+                    id="subject-description-input" maxlength="300"
+                    placeholder="Topics to revise, upcoming practicals..."></textarea></div>
+            <div class="field-pair">
+                <div class="field"><label for="subject-progress-input">Preparation completion (%)</label><input
+                        id="subject-progress-input" type="number" min="0" max="100" step="5" value="0" required></div>
+                <div class="field"><label for="subject-score-input">Preparation score (0–10)</label><input
+                        id="subject-score-input" type="number" min="0" max="10" step="0.5" value="0" required></div>
+            </div>
+            <div class="form-actions"><button class="secondary-button" type="button"
+                    data-close-subject-dialog>Cancel</button><button class="primary-button" id="save-subject-button"
+                    type="submit">Add to tracker</button></div>
+        </form>
+    </dialog>
+    <div id="toast-region" aria-live="polite" aria-atomic="true"></div>
+    <script src="index.js" defer></script>
 </body>
+
 </html>
